@@ -12,6 +12,7 @@ import (
 
 	"github.com/m1k1o/neko/server/internal/api/room"
 	"github.com/m1k1o/neko/server/internal/plugins/chat"
+	"github.com/m1k1o/neko/server/internal/plugins/draw"
 	"github.com/m1k1o/neko/server/internal/plugins/filetransfer"
 	"github.com/m1k1o/neko/server/internal/plugins/openinapp"
 	"github.com/m1k1o/neko/server/pkg/types"
@@ -207,6 +208,24 @@ func (s *session) wsToBackend(msg []byte) error {
 			return err
     }
     return s.apiReq(http.MethodPost, "/api/openinapp/openlink", request, nil)
+
+	// Draw Events (fork): legacy client sends flat messages, pass them through
+	case draw.DRAW_STROKE:
+		request := &draw.StrokePayload{}
+		if err := json.Unmarshal(msg, request); err != nil {
+			return err
+		}
+		return s.toBackend(draw.DRAW_STROKE, request)
+
+	case draw.DRAW_UNDO:
+		request := &draw.UndoPayload{}
+		if err := json.Unmarshal(msg, request); err != nil {
+			return err
+		}
+		return s.toBackend(draw.DRAW_UNDO, request)
+
+	case draw.DRAW_CLEAR:
+		return s.toBackend(draw.DRAW_CLEAR, struct{}{})
 
 	// Screen Events
 	case oldEvent.SCREEN_RESOLUTION:
