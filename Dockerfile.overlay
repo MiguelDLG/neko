@@ -1,0 +1,56 @@
+# Builds this fork's server + client and layers them on top of an upstream
+# neko application image (default: firefox). This avoids rebuilding the whole
+# runtime (xorg, gstreamer, browser) and keeps the fork image small to build.
+#
+#   docker build -f Dockerfile.overlay -t ghcr.io/shiritaicrm/neko/firefox:latest .
+#   docker build -f Dockerfile.overlay --build-arg BASE_IMAGE=ghcr.io/m1k1o/neko/chromium:latest -t ghcr.io/shiritaicrm/neko/chromium:latest .
+#
+# The BASE_IMAGE must be built from the same upstream release as this fork's
+# master (see the "upstream" remote), so the server binary matches the runtime
+# libraries (gstreamer, xorg) shipped in the base image.
+
+ARG BASE_IMAGE=ghcr.io/m1k1o/neko/firefox:latest
+
+#
+# server
+FROM golang:1.25-trixie AS server
+
+WORKDIR /src
+
+ENV DEBIAN_FRONTEND=noninteractive
+RUN set -eux; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends \
+        libx11-dev libxrandr-dev libxtst-dev libgtk-3-dev libxcvt-dev \
+        libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev; \
+    apt-get clean -y; \
+    rm -rf /var/lib/apt/lists/* /var/cache/apt/*
+
+ARG GIT_COMMIT
+ARG GIT_BRANCH
+ARG GIT_TAG
+
+COPY server/ .
+RUN ./build core
+
+#
+# client
+FROM node:18-bullseye-slim AS client
+
+WORKDIR /src
+
+COPY client/package*.json ./
+RUN npm ci --no-audit --no-fund
+
+COPY client/ .
+RUN npm run build
+
+#
+# final image: upstream app image + our server binary and client bundle
+FROM $BASE_IMAGE
+
+LABEL org.opencontainers.image.source="https://github.com/shiritaicrm/neko"
+LABEL org.opencontainers.image.description="neko with a shared drawing board (shiritaicrm fork)"
+
+COPY --from=server /src/bin/neko /usr/bin/neko
+COPY --from=client /src/dist/ /var/www

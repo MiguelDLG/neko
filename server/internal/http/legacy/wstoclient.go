@@ -13,6 +13,7 @@ import (
 	oldTypes "github.com/m1k1o/neko/server/internal/http/legacy/types"
 
 	"github.com/m1k1o/neko/server/internal/plugins/chat"
+	"github.com/m1k1o/neko/server/internal/plugins/draw"
 	"github.com/m1k1o/neko/server/internal/plugins/filetransfer"
 	"github.com/m1k1o/neko/server/internal/plugins/openinapp"
 	"github.com/m1k1o/neko/server/pkg/types"
@@ -630,6 +631,17 @@ func (s *session) wsToClient(msg []byte) error {
 			Enabled: request.Enabled,
     })
 
+
+	// Draw Events (fork): flatten {event, payload} into the legacy shape
+	case draw.DRAW_INIT, draw.DRAW_STROKE, draw.DRAW_UNDO, draw.DRAW_CLEAR:
+		flat := map[string]any{}
+		if len(data.Payload) > 0 {
+			if err := json.Unmarshal(data.Payload, &flat); err != nil {
+				return err
+			}
+		}
+		flat["event"] = data.Event
+		return s.toClient(flat)
 
 	// Screen Events
 	case event.SCREEN_UPDATED:
