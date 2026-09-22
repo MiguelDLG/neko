@@ -12,6 +12,7 @@ import (
 
 	"github.com/m1k1o/neko/server/internal/config"
 	"github.com/m1k1o/neko/server/internal/plugins/chat"
+	"github.com/m1k1o/neko/server/internal/plugins/draw"
 	"github.com/m1k1o/neko/server/internal/plugins/filetransfer"
 	"github.com/m1k1o/neko/server/internal/plugins/openinapp"
 	"github.com/m1k1o/neko/server/pkg/types"
@@ -49,6 +50,7 @@ func New(config *config.Plugins) *ManagerCtx {
 	manager.plugins.addPlugin(filetransfer.NewPlugin())
 	manager.plugins.addPlugin(chat.NewPlugin())
 	manager.plugins.addPlugin(openinapp.NewPlugin())
+	manager.plugins.addPlugin(draw.NewPlugin())
 
 	return manager
 }

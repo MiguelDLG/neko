@@ -49,6 +49,12 @@ export const EVENT = {
     INIT: 'openinapp/init',
     OPENLINK: 'openinapp/openlink',
   },
+  DRAW: {
+    INIT: 'draw/init',
+    STROKE: 'draw/stroke',
+    UNDO: 'draw/undo',
+    CLEAR: 'draw/clear',
+  },
   SCREEN: {
     CONFIGURATIONS: 'screen/configurations',
     RESOLUTION: 'screen/resolution',
@@ -83,6 +89,7 @@ export type WebSocketEvents =
   | ChatEvents
   | FileTransferEvents
   | OpenInAppEvents
+  | DrawEvents
   | ScreenEvents
   | BroadcastEvents
   | AdminEvents
@@ -110,6 +117,12 @@ export type ChatEvents = typeof EVENT.CHAT.MESSAGE | typeof EVENT.CHAT.EMOTE
 export type FileTransferEvents = typeof EVENT.FILETRANSFER.LIST | typeof EVENT.FILETRANSFER.REFRESH
 
 export type OpenInAppEvents = typeof EVENT.OPENINAPP.INIT | typeof EVENT.OPENINAPP.OPENLINK
+
+export type DrawEvents =
+  | typeof EVENT.DRAW.INIT
+  | typeof EVENT.DRAW.STROKE
+  | typeof EVENT.DRAW.UNDO
+  | typeof EVENT.DRAW.CLEAR
 
 export type ScreenEvents = typeof EVENT.SCREEN.CONFIGURATIONS | typeof EVENT.SCREEN.RESOLUTION | typeof EVENT.SCREEN.SET
 

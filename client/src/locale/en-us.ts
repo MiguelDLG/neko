@@ -5,6 +5,16 @@ export const you = 'You'
 export const somebody = 'Somebody'
 export const send_a_message = 'Send a message'
 
+export const draw = {
+  start: 'Draw on screen',
+  stop: 'Stop drawing',
+  undo: 'Undo my last stroke (Ctrl+Z)',
+  clear: 'Clear the board for everyone',
+  close: 'Close (Esc)',
+  fade_on: 'Ink disappears after a few seconds',
+  fade_off: 'Ink stays on screen',
+}
+
 export const side = {
   chat: 'Chat',
   files: 'Files',

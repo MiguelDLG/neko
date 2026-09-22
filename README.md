@@ -1,3 +1,5 @@
+> **shiritaicrm fork:** adds a **shared drawing board** on top of the stream. See [DRAWING-BOARD.md](DRAWING-BOARD.md). Image: `ghcr.io/shiritaicrm/neko/firefox`.
+
 <div align="center">
   <a href="https://github.com/m1k1o/neko" title="Neko's Github repository.">
     <img src="https://neko.m1k1o.net/img/logo.png" width="400" height="auto"/>

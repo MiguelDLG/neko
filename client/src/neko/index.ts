@@ -23,6 +23,9 @@ import {
   SystemInitPayload,
   AdminLockResource,
   FileTransferListPayload,
+  DrawInitPayload,
+  DrawStrokePayload,
+  DrawUndoPayload,
 } from './messages'
 
 interface NekoEvents extends BaseEvents {}
@@ -55,6 +58,7 @@ export class NekoClient extends BaseClient implements EventEmitter<NekoEvents> {
     this.$accessor.user.reset()
     this.$accessor.video.reset()
     this.$accessor.chat.reset()
+    this.$accessor.draw.reset()
   }
 
   login(password: string, displayname: string) {
@@ -380,6 +384,35 @@ export class NekoClient extends BaseClient implements EventEmitter<NekoEvents> {
   /////////////////////////////
   protected [EVENT.OPENINAPP.INIT]({ enabled }: { enabled: boolean }) {
     this.$accessor.openinapp.setEnabled(enabled)
+  }
+
+  /////////////////////////////
+  // Draw Events
+  /////////////////////////////
+  protected [EVENT.DRAW.INIT]({ enabled, can_draw, strokes }: DrawInitPayload) {
+    this.$accessor.draw.setInit({ enabled, canDraw: can_draw, strokes: strokes || [] })
+  }
+
+  protected [EVENT.DRAW.STROKE](stroke: DrawStrokePayload) {
+    // our own strokes are rendered locally before being sent
+    if (stroke.user_id === this.$accessor.user.id) {
+      return
+    }
+
+    const member = this.member(stroke.user_id)
+    if (member && member.ignored) {
+      return
+    }
+
+    this.$accessor.draw.upsertStroke(stroke)
+  }
+
+  protected [EVENT.DRAW.UNDO]({ id }: DrawUndoPayload) {
+    this.$accessor.draw.removeStroke(id)
+  }
+
+  protected [EVENT.DRAW.CLEAR]() {
+    this.$accessor.draw.clear()
   }
 
   /////////////////////////////

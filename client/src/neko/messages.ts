@@ -196,6 +196,54 @@ export interface EmojiSendPayload {
 }
 
 /*
+  DRAW PAYLOADS
+*/
+// [x, y] normalized to the video frame (0..1)
+export type DrawPoint = [number, number]
+
+export interface DrawStroke {
+  id: string
+  user_id: string
+  color: string
+  // fraction of the video width
+  width: number
+  fade?: boolean
+  points: DrawPoint[]
+}
+
+// draw/init
+export interface DrawInitPayload {
+  enabled: boolean
+  can_draw: boolean
+  strokes: DrawStroke[]
+}
+
+// draw/stroke (client -> server)
+export interface DrawStrokeSendPayload {
+  id: string
+  color: string
+  width: number
+  fade?: boolean
+  points: DrawPoint[]
+}
+
+// draw/stroke (server -> client)
+export interface DrawStrokePayload extends DrawStrokeSendPayload {
+  user_id: string
+}
+
+// draw/undo
+export interface DrawUndoPayload {
+  id: string
+  user_id: string
+}
+
+// draw/clear
+export interface DrawClearPayload {
+  user_id: string
+}
+
+/*
   FILE TRANSFER PAYLOADS
 */
 export interface FileTransferListMessage extends WebSocketMessage, FileTransferListPayload {

@@ -29,6 +29,7 @@
           @compositionstart="onCompositionStartHandler"
           @compositionend="onCompositionEndHandler"
         />
+        <neko-draw v-if="drawEnabled" :hideControls="hideControls" />
         <div v-if="!playing && playable" class="player-overlay" @click.stop.prevent="playAndUnmute">
           <i class="fas fa-play-circle" />
         </div>
@@ -40,6 +41,18 @@
       <ul v-if="!fullscreen && !hideControls" class="video-menu top">
         <li><i @click.stop.prevent="requestFullscreen" class="fas fa-expand"></i></li>
         <li v-if="admin"><i @click.stop.prevent="openResolution" class="fas fa-desktop"></i></li>
+        <li v-if="drawAvailable">
+          <i
+            :class="[drawActive ? 'active' : '', 'fas', 'fa-pen']"
+            v-tooltip="{
+              content: drawActive ? $t('draw.stop') : $t('draw.start'),
+              placement: 'left',
+              offset: 5,
+              boundariesElement: 'body',
+            }"
+            @click.stop.prevent="toggleDraw"
+          />
+        </li>
         <li v-if="!controlLocked && !implicitHosting" :class="extraControls || 'extra-control'">
           <i
             :class="[
@@ -108,6 +121,10 @@
           i {
             width: 30px;
             height: 30px;
+
+            &.active {
+              color: $style-primary;
+            }
             background: rgba($color: #fff, $alpha: 0.2);
             border-radius: 5px;
             line-height: 30px;
@@ -218,6 +235,7 @@
   import Emote from './emote.vue'
   import Resolution from './resolution.vue'
   import Clipboard from './clipboard.vue'
+  import Draw from './draw.vue'
 
   // @ts-ignore
   import GuacamoleKeyboard from '~/utils/guacamole-keyboard.ts'
@@ -230,6 +248,7 @@
       'neko-emote': Emote,
       'neko-resolution': Resolution,
       'neko-clipboard': Clipboard,
+      'neko-draw': Draw,
     },
   })
   export default class extends Vue {
@@ -304,6 +323,18 @@
 
     get emotes() {
       return this.$accessor.chat.emotes
+    }
+
+    get drawEnabled() {
+      return this.$accessor.draw.enabled
+    }
+
+    get drawAvailable() {
+      return this.$accessor.draw.available
+    }
+
+    get drawActive() {
+      return this.$accessor.draw.active
     }
 
     get autoplay() {
@@ -639,6 +670,10 @@
 
     requestControl() {
       this.$accessor.remote.request()
+    }
+
+    toggleDraw() {
+      this.$accessor.draw.toggle()
     }
 
     requestFullscreen() {
