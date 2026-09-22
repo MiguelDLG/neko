@@ -78,11 +78,11 @@ over an upstream app image, so the runtime (xorg, gstreamer, browser) does not
 have to be rebuilt:
 
 ```sh
-docker build -f Dockerfile.overlay -t ghcr.io/shiritaicrm/neko/firefox:latest .
+docker build -f Dockerfile.overlay -t ghcr.io/migueldlg/neko/firefox:latest .
 ```
 
 The `Fork Image` GitHub workflow does the same on every push to `master` and
-publishes `ghcr.io/shiritaicrm/neko/firefox:latest`. Keep the upstream base
+publishes `ghcr.io/migueldlg/neko/firefox:latest`. Keep the upstream base
 tag in sync with the upstream commit this fork is rebased on.
 
 ## Keeping up with upstream
